@@ -19,6 +19,7 @@ app.get('/',(req, res)=>{
 
 client.connect(err => {
   const productsCollection = client.db("nmEcommerce").collection("products");
+  const ordersCollection = client.db("nmEcommerce").collection("orders");
   // create products
   app.post('/addProduct',(req, res) =>{
     const products = req.body;
@@ -49,6 +50,14 @@ client.connect(err => {
     productsCollection.find({key: {$in: productKeys}})
     .toArray((err, documents) =>{
       res.send(documents);
+    })
+  })
+  // create order
+  app.post('/addOrder',(req, res) =>{
+    const order = req.body;
+    ordersCollection.insertOne(order)
+    .then(result =>{
+      res.send(result.insertedCount > 0);
     })
   })
  
