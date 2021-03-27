@@ -19,14 +19,45 @@ app.get('/',(req, res)=>{
 
 client.connect(err => {
   const productsCollection = client.db("nmEcommerce").collection("products");
-  // perform actions on the collection object
+  const ordersCollection = client.db("nmEcommerce").collection("orders");
+  // create products
   app.post('/addProduct',(req, res) =>{
     const products = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     productsCollection.insertMany(products)
     .then(result =>{
       res.send(result.insertedCount);
-      console.log(result);
+      // console.log(result);
+    })
+  })
+  //read products
+  app.get('/products',(req, res) =>{
+    productsCollection.find({})
+    .toArray((err, documents) =>{
+      res.send(documents);
+    })
+  })
+  //load single product
+  app.get('/product/:key', (req, res) =>{
+    productsCollection.find({key:req.params.key})
+    .toArray((err, documents) =>{
+      res.send(documents[0]);
+    })
+  })
+  //load order data or card data
+  app.post('/productByKey',(req, res) =>{
+    const productKeys = req.body;
+    productsCollection.find({key: {$in: productKeys}})
+    .toArray((err, documents) =>{
+      res.send(documents);
+    })
+  })
+  // create order
+  app.post('/addOrder',(req, res) =>{
+    const order = req.body;
+    ordersCollection.insertOne(order)
+    .then(result =>{
+      res.send(result.insertedCount > 0);
     })
   })
  
